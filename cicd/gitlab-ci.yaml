@@ -1,0 +1,45 @@
+variables:
+    IMAGE_VERSION: "${REGISTRY_URL}/${REGISTRY_USER}/${CI_PROJECT_NAME}:${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_TAG}"
+
+stages:       
+- build
+- push
+- deploy
+
+build:
+    stage: build
+    variables:
+        GIT_STRATEGY: clone
+    before_script:
+        - docker login -u ${REGISTRY_USER} -p ${REGISTRY_PASSWORD} ${REGISTRY_URL}
+    script:
+        - docker build -t ${IMAGE_VERSION} .
+    tags:
+        - runner-beeshoes
+    only:
+        - tags
+
+push:
+    stage: push
+    variables:
+        GIT_STRATERY: none
+    script:
+        - docker push ${IMAGE_VERSION}
+    after_script: 
+        - docker logout ${REGISTRY_URL}
+    tags:
+        - runner-beeshoes
+    only:
+        - tags
+
+deploy: 
+    stage: deploy 
+    variables:
+        GIT_STRATEGY: none 
+    script:
+        - sed -i "s|dynamic_image|$IMAGE_VERSION|" ./manifest/beeshoes-1-backend-deployment.yaml
+        - kubectl apply -f ./manifest/beeshoes-1-backend-deployment.yaml
+    tags:
+        - runner-k8s-shell
+    only:
+        - tags
