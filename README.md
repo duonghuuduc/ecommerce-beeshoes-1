@@ -5,7 +5,9 @@
 > See it live here: https://ecommerce-app-ms-sql-net-react.vercel.app/
 
 ![1](images/1.png)
-
+![2](images/2.png)
+![3](images/3.png)
+![4](images/4.png)
 
 <!-- TABLE OF CONTENTS -->
 <details>
